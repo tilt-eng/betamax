@@ -17,7 +17,7 @@ abstract class RecordedMessage extends AbstractMessage implements Message {
 		if (headers[name]) {
 			headers[name] = "${headers[name]}, $value".toString()
 		} else {
-			headers[name] = value
+			headers[name] = value.toString()
 		}
 	}
 
