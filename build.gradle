@@ -6,41 +6,41 @@ apply plugin: 'org.ajoberstar.github-pages'
 def currentJvm = org.gradle.internal.jvm.Jvm.current()
 
 def getNexusCredentials() {
-  String userHome = System.getProperty("user.home")
-  File f = new File("$userHome/.ivy2/.banno_credentials")
-  Map<String, String> credMap = [:]
+    String userHome = System.getProperty("user.home")
+    File f = new File("$userHome/.ivy2/.banno_credentials")
+    Map<String, String> credMap = [:]
 
-  if(f.exists()) {
-    f.readLines().inject(credMap) {map, line ->
-      String[] entry = line.split("=")
-      if(entry.size() == 2) map.put(entry[0].trim(), entry[1].trim())
-      map
+    if (f.exists()) {
+        f.readLines().inject(credMap) { map, line ->
+            String[] entry = line.split("=")
+            if (entry.size() == 2) map.put(entry[0].trim(), entry[1].trim())
+            map
+        }
+    } else {
+        throw new RuntimeException("No credentials file found (${f.getAbsolutePath()})")
     }
-  } else {
-    throw new RuntimeException("No credentials file found (${f.getAbsolutePath()})")
-  }
 
-  // Sets project properties used by nexus plugin
-  ext {
-    nexusUsername = credMap["user"]
-    nexusPassword = credMap["password"]
-  }
+    // Sets project properties used by nexus plugin
+    ext {
+        nexusUsername = credMap["user"]
+        nexusPassword = credMap["password"]
+    }
 }
 
-getNexusCredentials()
-
-if(!(currentJvm ==~ /1\.7\..*/)) {
-  ant.fail("Java version 1.7.x required, found '$currentJvm'")
-}
+//getNexusCredentials()
+//
+//if(!(currentJvm ==~ /1\.7\..*/)) {
+//  ant.fail("Java version 1.7.x required, found '$currentJvm'")
+//}
 
 buildscript {
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
-		classpath 'org.ajoberstar:gradle-git:1.2.0-milestone.1'
-	}
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+        classpath 'org.ajoberstar:gradle-git:1.2.0-milestone.1'
+    }
 }
 
 version = "2.0.0-banno"
@@ -48,94 +48,95 @@ group = 'co.freeside'
 archivesBaseName = 'betamax'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 nexus {
-  repositoryUrl  "http://nexus.banno.com/nexus/content/repositories/releases/"
-  snapshotRepositoryUrl "http://nexus.banno.com/nexus/content/repositories/snapshots/"
+    repositoryUrl "http://nexus.banno.com/nexus/content/repositories/releases/"
+    snapshotRepositoryUrl "http://nexus.banno.com/nexus/content/repositories/snapshots/"
 
 }
 
 dependencies {
-        compile 'org.codehaus.groovy:groovy-all:2.3.0:indy',
-        'junit:junit:4.10',
-        'org.yaml:snakeyaml:1.13',
-        'org.apache.httpcomponents:httpclient:4.3.6',
-        'commons-lang:commons-lang:2.6',
-        'org.eclipse.jetty:jetty-server:8.1.2.v20120308'
+    compile 'org.codehaus.groovy:groovy-all:2.3.0:indy',
+            'junit:junit:4.10',
+            'org.yaml:snakeyaml:1.13',
+            'org.apache.httpcomponents:httpclient:4.3.6',
+            'commons-lang:commons-lang:2.6',
+            'org.eclipse.jetty:jetty-server:9.2.13.v20150730',
+            'org.eclipse.jetty:jetty-proxy:9.2.13.v20150730'
 
-	testCompile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
-		exclude module: 'groovy'
-		exclude module: 'httpclient'
-	}
-	testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
-		exclude module: 'groovy-all'
-		exclude module: 'junit-dep'
-	}
-	testCompile 'commons-httpclient:commons-httpclient:3.1',
-		    'com.github.groovy-wslite:groovy-wslite:0.7.1'
+    testCompile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
+        exclude module: 'groovy'
+        exclude module: 'httpclient'
+    }
+    testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
+        exclude module: 'groovy-all'
+        exclude module: 'junit-dep'
+    }
+    testCompile 'commons-httpclient:commons-httpclient:3.1',
+            'com.github.groovy-wslite:groovy-wslite:0.7.1'
 
-        testRuntime 'cglib:cglib-nodep:3.1',
-                    'org.objenesis:objenesis:2.1'
+    testRuntime 'cglib:cglib-nodep:3.1',
+            'org.objenesis:objenesis:2.1'
 }
 
 modifyPom {
-	dependencies.removeAll(dependencies.findAll { it.scope == 'test' })
+    dependencies.removeAll(dependencies.findAll { it.scope == 'test' })
 
-	project {
-		name 'Betamax - An HTTP stubbing proxy for testing JVM applications.'
-		packaging 'jar'
-		description 'Betamax is a Groovy record/playback proxy for stubbing access to external HTTP resources when testing. Inspired by Ruby\'s VCR.'
-		url 'http://freeside.co/betamax'
-		inceptionYear '2011'
+    project {
+        name 'Betamax - An HTTP stubbing proxy for testing JVM applications.'
+        packaging 'jar'
+        description 'Betamax is a Groovy record/playback proxy for stubbing access to external HTTP resources when testing. Inspired by Ruby\'s VCR.'
+        url 'http://freeside.co/betamax'
+        inceptionYear '2011'
 
-		scm {
-			url 'scm:git@github.com:robfletcher/betamax.git'
-			connection 'scm:git@github.com:robfletcher/betamax.git'
-			developerConnection 'scm:git@github.com:robfletcher/betamax.git'
-		}
+        scm {
+            url 'scm:git@github.com:robfletcher/betamax.git'
+            connection 'scm:git@github.com:robfletcher/betamax.git'
+            developerConnection 'scm:git@github.com:robfletcher/betamax.git'
+        }
 
-		licenses {
-			license {
-				name 'The Apache Software License, Version 2.0'
-				url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-				distribution 'repo'
-			}
-		}
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
 
-		developers {
-			developer {
-				id 'robfletcher'
-				name 'Rob Fletcher'
-				url 'http://blog.freeside.co/'
-				roles {
-					role 'Lead'
-					role 'Founder'
-				}
-			}
-		}
-	}
+        developers {
+            developer {
+                id 'robfletcher'
+                name 'Rob Fletcher'
+                url 'http://blog.freeside.co/'
+                roles {
+                    role 'Lead'
+                    role 'Founder'
+                }
+            }
+        }
+    }
 }
 
 
 
 nexus {
-	sign = false
+    sign = false
 }
 
 codenarc {
-	toolVersion = '0.17'
-	ignoreFailures = true
+    toolVersion = '0.17'
+    ignoreFailures = true
 }
 
 githubPages {
-	repoUri = 'git@github.com:robfletcher/betamax.git'
-	workingPath = "$buildDir/docs"
-	pages {
-		exclude '**/_site/**'
-		from('src/docs') {
-			exclude '**/*.less'
-		}
-	}
+    repoUri = 'git@github.com:robfletcher/betamax.git'
+    workingPath = "$buildDir/docs"
+    pages {
+        exclude '**/_site/**'
+        from('src/docs') {
+            exclude '**/*.less'
+        }
+    }
 }

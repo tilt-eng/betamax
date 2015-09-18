@@ -27,7 +27,7 @@ import org.apache.http.impl.conn.ProxySelectorRoutePlanner
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager
 import org.apache.http.params.HttpConnectionParams
 import org.eclipse.jetty.server.*
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import static co.freeside.betamax.Recorder.DEFAULT_PROXY_PORT
 
 class ProxyServer extends SimpleServer implements HttpInterceptor {
@@ -94,7 +94,7 @@ class ProxyServer extends SimpleServer implements HttpInterceptor {
 	}
 
 	private Connector createSSLConnector(int port) {
-		new SslSelectChannelConnector(
+		new SslContextFactory(
 				port: port, // TODO: separate property
 				keystore: ProxyServer.getResource('/betamax.keystore'),
 				password: 'password',
